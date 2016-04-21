@@ -1,4 +1,4 @@
-//package f2.5610110338;
+package f2.s5610110338;
 
 import java.awt.BorderLayout;
 
@@ -10,6 +10,12 @@ public class Main{
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(400, 650);
 		frame.getContentPane().setLayout(new BorderLayout());
+		SpaceShip v = new SpaceShip(90, 90, 20, 20);
+		GamePanel gp = new GamePanel();
+		GameEngine engine = new GameEngine(gp, v);
+		frame.getContentPane().add(gp, BorderLayout.CENTER);
 		frame.setVisible(true);
+
+		engine.start();
 	}
 }

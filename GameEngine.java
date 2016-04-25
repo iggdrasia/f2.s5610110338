@@ -9,7 +9,7 @@ import java.util.*;
 import javax.swing.Timer;
 
 
-public class GameEngine{
+public class GameEngine implements KeyListener{
 	GamePanel gp;
 	
 	private SpaceShip v;	
@@ -40,6 +40,39 @@ public class GameEngine{
 	}
 	private void process(){
 		gp.updateGameUI();
+	}
+
+	public void controlVehicle(KeyEvent e) {
+		switch (e.getKeyCode()) {
+		case KeyEvent.VK_LEFT:
+			v.move(-1,0);
+			break;
+		case KeyEvent.VK_RIGHT:
+			v.move(1,0);
+			break;
+		case KeyEvent.VK_UP:
+			v.move(0,-1);
+			break;
+		case KeyEvent.VK_DOWN:
+			v.move(0,1);
+			break;
+		}
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		controlVehicle(e);
+		
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		//do nothing
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		//do nothing		
 	}
 	
 }

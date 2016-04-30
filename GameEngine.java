@@ -14,9 +14,11 @@ public class GameEngine implements KeyListener{
 	GamePanel gp;	
 	private ArrayList<Enemy01> enemies01 = new ArrayList<Enemy01>();	
 	private ArrayList<Enemy02> enemies02 = new ArrayList<Enemy02>();	
+	private ArrayList<Bullet> bullet = new ArrayList<Bullet>();	
 	private Timer timer;
-	private double difficulty = 0.15;
-	private SpaceShip v;	
+	private double difficulty = 0.1;
+	private SpaceShip v;
+	private int bullet_delay = 0;
 	Random randomBullet = new Random();
 
 	public GameEngine(GamePanel gp, SpaceShip v) {
@@ -39,7 +41,13 @@ public class GameEngine implements KeyListener{
 	public void start(){
 		timer.start();
 	}
-	
+
+	private void generateBullet(){
+		Bullet b = new Bullet( (v.x + 6), v.y);
+		gp.sprites.add(b);
+		bullet.add(b);
+	}
+
 	private void generateEnemy01(){
 		Enemy01 e01 = new Enemy01((int)(Math.random()*390), 0);
 		gp.sprites.add(e01);
@@ -57,7 +65,21 @@ public class GameEngine implements KeyListener{
 			generateEnemy01();
 			generateEnemy02();
 		}
+		
+		if(bullet_delay % 5 == 0)
+			generateBullet();
 
+		Iterator<Bullet> b_iter = bullet.iterator();
+		while(b_iter.hasNext()){
+			Bullet bu = b_iter.next();
+			bu.proceed();
+			
+			if(!bu.isAlive()){
+				b_iter.remove();
+				gp.sprites.remove(bu);
+			}
+		}
+		
 		Iterator<Enemy01> e_iter01 = enemies01.iterator();
 		while(e_iter01.hasNext()){
 			Enemy01 e1 = e_iter01.next();
@@ -83,25 +105,46 @@ public class GameEngine implements KeyListener{
 		gp.updateGameUI();
 		
 		Rectangle2D.Double vr = v.getRectangle();
-		Rectangle2D.Double er01, er02;
+		Rectangle2D.Double er01, er02, bul;
+
 		for(Enemy01 e : enemies01){
-			er01 = e.getRectangle();
-			if(er01.intersects(vr)){
-				die();
-				return;
+			for(Bullet b : bullet){
+				bul = b.getRectangle();
+				er01 = e.getRectangle();
+				if(er01.intersects(vr)){
+					die();
+					return;
+				}
+				if(er01.intersects(bul)){
+					e.alive = false;
+					return;
+				}
 			}
 		}
 
 		for(Enemy02 e : enemies02){
-			er02 = e.getRectangle();
-			if(er02.intersects(vr)){
-				die();
-				return;
+			for(Bullet b : bullet){
+				bul = b.getRectangle();
+				er02 = e.getRectangle();
+				if(er02.intersects(vr)){
+					die();
+					return;
+				}
+				if(er02.intersects(bul)){
+					e.alive = false;
+					return;
+				}
 			}
 		}
+
+		bullet_delay++;
 	}
 	
 	public void die(){
+		timer.stop();
+	}
+
+	public void Gen_Bullet(){
 		timer.stop();
 	}
 	
@@ -127,8 +170,7 @@ public class GameEngine implements KeyListener{
 	
 	@Override
 	public void keyPressed(KeyEvent e) {
-		controlVehicle(e);
-		
+		controlVehicle(e);		
 	}
 
 	@Override
